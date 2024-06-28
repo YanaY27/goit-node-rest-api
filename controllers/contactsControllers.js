@@ -52,10 +52,7 @@ const updateContact = async (req, res, next) => {
     const { name, email, phone } = req.body;
 
     if (!name && !email && !phone) {
-      throw HttpError(
-        400,
-        "At least one field (name, email, phone) must be present in the request body"
-      );
+      throw HttpError(400, "At least one field must be filled");
     }
 
     const result = await contactsService.updateContactById(id, {
