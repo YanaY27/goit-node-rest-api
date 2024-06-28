@@ -1,5 +1,4 @@
 const express = require("express");
-
 const {
   getAllContacts,
   getContact,
@@ -9,7 +8,6 @@ const {
 } = require("../controllers/contactsControllers");
 
 const { validateBody } = require("../helpers/validateBody");
-
 const {
   createContactSchema,
   updateContactSchema,
@@ -18,13 +16,9 @@ const {
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", getAllContacts);
-
 contactsRouter.get("/:id", getContact);
-
 contactsRouter.delete("/:id", deleteContact);
-
 contactsRouter.post("/", validateBody(createContactSchema), createContact);
-
 contactsRouter.put("/:id", validateBody(updateContactSchema), updateContact);
 
 module.exports = contactsRouter;
