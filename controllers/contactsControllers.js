@@ -1,7 +1,7 @@
-const { HttpError } = require("../helpers/HttpError");
-const contactsService = require("../services/contactsServices");
+import { HttpError } from "../helpers/HttpError.js";
+import * as contactsService from "../services/contactsServices.js";
 
-const getAllContacts = async (req, res, next) => {
+export const getAllContacts = async (req, res, next) => {
   try {
     const result = await contactsService.listContacts();
     res.json(result);
@@ -10,7 +10,7 @@ const getAllContacts = async (req, res, next) => {
   }
 };
 
-const getContact = async (req, res, next) => {
+export const getContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await contactsService.getContactById(id);
@@ -23,7 +23,7 @@ const getContact = async (req, res, next) => {
   }
 };
 
-const deleteContact = async (req, res, next) => {
+export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await contactsService.removeContact(id);
@@ -36,7 +36,7 @@ const deleteContact = async (req, res, next) => {
   }
 };
 
-const createContact = async (req, res, next) => {
+export const createContact = async (req, res, next) => {
   try {
     const { name, email, phone } = req.body;
     const result = await contactsService.addContact(name, email, phone);
@@ -46,7 +46,7 @@ const createContact = async (req, res, next) => {
   }
 };
 
-const updateContact = async (req, res, next) => {
+export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, email, phone } = req.body;
@@ -69,12 +69,4 @@ const updateContact = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  getAllContacts,
-  getContact,
-  deleteContact,
-  createContact,
-  updateContact,
 };
