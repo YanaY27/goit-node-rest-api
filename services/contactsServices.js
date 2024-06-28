@@ -47,16 +47,15 @@ async function addContact(name, email, phone) {
   return newContact;
 }
 
-async function updateContactById(req, res, next) {
-  try {
-    const updatedContact = await updateContact(req.params.id, req.body);
-    if (!updatedContact) {
-      throw new HttpError("Not found", 404);
-    }
-    res.status(200).json(updatedContact);
-  } catch (error) {
-    next(error);
+async function updateContactById(contactId, updatedFields) {
+  const contacts = await readContacts();
+  const index = contacts.findIndex((contact) => contact.id === contactId);
+  if (index === -1) {
+    return null;
   }
+  Object.assign(contacts[index], updatedFields);
+  await writeContacts(contacts);
+  return contacts[index];
 }
 
 module.exports = {
