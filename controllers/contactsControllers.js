@@ -1,5 +1,6 @@
-import { HttpError } from "../helpers/HttpError.js";
+// controllers/contactsControllers.js
 import * as contactsService from "../services/contactsServices.js";
+import { HttpError } from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res, next) => {
   try {
@@ -56,7 +57,7 @@ export const updateContact = async (req, res, next) => {
     const { id } = req.params;
     const { name, email, phone, favorite } = req.body;
 
-    if (!name && !email && !phone) {
+    if (!name && !email && !phone && favorite === undefined) {
       throw HttpError(400, "At least one field must be filled");
     }
 
@@ -79,17 +80,19 @@ export const updateContact = async (req, res, next) => {
 
 export const updateStatusContact = async (req, res, next) => {
   try {
-    const { contactId } = req.params;
+    const { id } = req.params;
     const { favorite } = req.body;
 
     if (favorite === undefined) {
       throw HttpError(400, '"favorite" is required');
     }
 
-    const updatedContact = await updateContactById(contactId, { favorite });
+    const updatedContact = await contactsService.updateStatusContact(id, {
+      favorite,
+    });
 
     if (!updatedContact) {
-      throw HttpError(404, "Contact not found");
+      throw HttpError(404, "Not found");
     }
 
     res.json(updatedContact);
