@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import Contact from "../models/contact.js";
 
 const __dirname = path.dirname(
   new URL(import.meta.url).pathname.replace(/^\/(\w:\/)/, "$1")
@@ -61,3 +62,11 @@ export async function updateContactById(contactId, updatedFields) {
   await writeContacts(contacts);
   return contacts[index];
 }
+
+export const updateStatusContact = async (contactId, { favorite }) => {
+  return await Contact.findByIdAndUpdate(
+    contactId,
+    { favorite },
+    { new: true }
+  );
+};

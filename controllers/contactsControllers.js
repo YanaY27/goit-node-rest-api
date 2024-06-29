@@ -38,8 +38,13 @@ export const deleteContact = async (req, res, next) => {
 
 export const createContact = async (req, res, next) => {
   try {
-    const { name, email, phone } = req.body;
-    const result = await contactsService.addContact(name, email, phone);
+    const { name, email, phone, favorite } = req.body;
+    const result = await contactsService.addContact(
+      name,
+      email,
+      phone,
+      favorite
+    );
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -49,7 +54,7 @@ export const createContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, email, phone } = req.body;
+    const { name, email, phone, favorite } = req.body;
 
     if (!name && !email && !phone) {
       throw HttpError(400, "At least one field must be filled");
@@ -59,6 +64,7 @@ export const updateContact = async (req, res, next) => {
       name,
       email,
       phone,
+      favorite,
     });
 
     if (!result) {
@@ -66,6 +72,27 @@ export const updateContact = async (req, res, next) => {
     }
 
     res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateStatusContact = async (req, res, next) => {
+  try {
+    const { contactId } = req.params;
+    const { favorite } = req.body;
+
+    if (favorite === undefined) {
+      throw HttpError(400, '"favorite" is required');
+    }
+
+    const updatedContact = await updateContactById(contactId, { favorite });
+
+    if (!updatedContact) {
+      throw HttpError(404, "Contact not found");
+    }
+
+    res.json(updatedContact);
   } catch (error) {
     next(error);
   }

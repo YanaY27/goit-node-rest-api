@@ -2,8 +2,11 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import contactsRouter from "./routes/contactsRouter.js";
+import connectDB from "./db/connectionDB.js";
 
 const app = express();
+
+connectDB();
 
 app.use(morgan("tiny"));
 app.use(cors());
