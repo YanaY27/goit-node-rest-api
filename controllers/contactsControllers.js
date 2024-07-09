@@ -1,10 +1,10 @@
-// controllers/contactsControllers.js
-import * as contactsService from "../services/contactsServices.js";
 import { HttpError } from "../helpers/HttpError.js";
+import * as contactsService from "../services/contactsServices.js";
 
 export const getAllContacts = async (req, res, next) => {
   try {
-    const result = await contactsService.listContacts();
+    const { _id: owner } = req.user;
+    const result = await contactsService.listContacts({ owner });
     res.json(result);
   } catch (error) {
     next(error);
@@ -14,9 +14,10 @@ export const getAllContacts = async (req, res, next) => {
 export const getContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await contactsService.getContactById(id);
+    const { _id: owner } = req.user;
+    const result = await contactsService.getContactById(id, owner);
     if (!result) {
-      throw HttpError(404, "Not found");
+      throw HttpError(404, "Contact not found");
     }
     res.json(result);
   } catch (error) {
@@ -27,9 +28,10 @@ export const getContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await contactsService.removeContact(id);
+    const { _id: owner } = req.user;
+    const result = await contactsService.removeContact(id, owner);
     if (!result) {
-      throw HttpError(404, "Not found");
+      throw HttpError(404, "Contact not found");
     }
     res.json(result);
   } catch (error) {
@@ -40,12 +42,14 @@ export const deleteContact = async (req, res, next) => {
 export const createContact = async (req, res, next) => {
   try {
     const { name, email, phone, favorite } = req.body;
-    const result = await contactsService.addContact(
+    const { _id: owner } = req.user;
+    const result = await contactsService.addContact({
       name,
       email,
       phone,
-      favorite
-    );
+      favorite,
+      owner,
+    });
     res.status(201).json(result);
   } catch (error) {
     next(error);
@@ -56,22 +60,18 @@ export const updateContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, email, phone, favorite } = req.body;
-
+    const { _id: owner } = req.user;
     if (!name && !email && !phone && favorite === undefined) {
       throw HttpError(400, "At least one field must be filled");
     }
-
-    const result = await contactsService.updateContactById(id, {
-      name,
-      email,
-      phone,
-      favorite,
-    });
-
+    const result = await contactsService.updateContactById(
+      id,
+      { name, email, phone, favorite },
+      owner
+    );
     if (!result) {
-      throw HttpError(404, "Not found");
+      throw HttpError(404, "Contact not found");
     }
-
     res.json(result);
   } catch (error) {
     next(error);
@@ -82,17 +82,20 @@ export const updateStatusContact = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { favorite } = req.body;
+    const { _id: owner } = req.user;
 
     if (favorite === undefined) {
       throw HttpError(400, '"favorite" is required');
     }
 
-    const updatedContact = await contactsService.updateStatusContact(id, {
-      favorite,
-    });
+    const updatedContact = await contactsService.updateContactById(
+      id,
+      { favorite },
+      owner
+    );
 
     if (!updatedContact) {
-      throw HttpError(404, "Not found");
+      throw HttpError(404, "Contact not found");
     }
 
     res.json(updatedContact);
